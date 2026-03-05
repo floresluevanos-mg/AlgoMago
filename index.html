@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algoritmos — Dra. Maria Flores Luevanos</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --panel: #ffffff;
+    --surface: #eef2f8;
+    --border: #d0d9ec;
+    --accent: #2563eb;
+    --accent2: #e05a00;
+    --accent3: #7c3aed;
+    --text: #1e2a45;
+    --muted: #7a89aa;
+    --green: #16a34a;
+    --red: #dc2626;
+    --yellow: #b45309;
+    --blue: #1d4ed8;
+    --header-bg: #1e2e5c;
+    --header-text: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--header-bg);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border-bottom: 3px solid var(--accent);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 20px;
+    flex-wrap: wrap;
+  }
+  .logo-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 12px rgba(37,99,235,0.4);
+  }
+  .logo-info { flex: 1; }
+  .logo-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+  }
+  .logo-title span {
+    background: linear-gradient(90deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .logo-sub {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-top: 2px;
+  }
+  .author-badge {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .author-badge .dot {
+    width: 7px; height: 7px;
+    background: #60a5fa;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .author-name {
+    color: #f0f4ff;
+    font-weight: 700;
+    font-size: 0.78rem;
+  }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex;
+    gap: 6px;
+    padding: 8px 20px;
+    background: #253368;
+    align-items: center;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .toolbar-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.12); margin: 0 4px; }
+
+  .btn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn-run {
+    background: #2563eb;
+    color: #fff;
+    padding: 7px 22px;
+    font-size: 0.83rem;
+    box-shadow: 0 2px 10px rgba(37,99,235,0.4);
+  }
+  .btn-run:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(37,99,235,0.5); }
+  .btn-stop { background: #dc2626; color: #fff; display: none; }
+  .btn-stop:hover { background: #b91c1c; }
+  .btn-clear { background: transparent; color: #94a3b8; border: 1px solid rgba(255,255,255,0.15); }
+  .btn-clear:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .btn-help { background: transparent; color: #a78bfa; border: 1px solid rgba(124,58,237,0.4); }
+  .btn-help:hover { background: rgba(124,58,237,0.15); }
+  .examples-label { font-size: 0.68rem; color: #64748b; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+  .btn-ex {
+    background: rgba(255,255,255,0.07);
+    color: #cbd5e1;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.72rem;
+    padding: 5px 10px;
+  }
+  .btn-ex:hover { background: rgba(96,165,250,0.15); border-color: rgba(96,165,250,0.4); color: #93c5fd; }
+
+  /* WORKSPACE */
+  .workspace {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .editor-wrap {
+    flex: 1.1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    border-right: 2px solid var(--border);
+    background: #ffffff;
+  }
+
+  .pane-header {
+    background: var(--surface);
+    padding: 7px 16px;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .pane-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot-blue { background: var(--accent); }
+  .dot-orange { background: var(--accent2); }
+
+  #editor {
+    flex: 1;
+    background: #fafcff;
+    color: #1e3a6e;
+    border: none;
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.85;
+    resize: none;
+    outline: none;
+    tab-size: 3;
+    caret-color: var(--accent);
+  }
+  #editor::selection { background: rgba(37,99,235,0.15); }
+  #editor::-webkit-scrollbar { width: 6px; }
+  #editor::-webkit-scrollbar-track { background: #eef2f8; }
+  #editor::-webkit-scrollbar-thumb { background: #c7d2e8; border-radius: 3px; }
+
+  /* CONSOLE */
+  .console-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+  }
+
+  #output {
+    flex: 1;
+    background: #f8faff;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.85;
+    overflow-y: auto;
+    min-height: 0;
+  }
+  #output::-webkit-scrollbar { width: 6px; }
+  #output::-webkit-scrollbar-track { background: #eef2f8; }
+  #output::-webkit-scrollbar-thumb { background: #c7d2e8; border-radius: 3px; }
+
+  .out-line { animation: fadein 0.1s ease; }
+  @keyframes fadein { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; } }
+
+  .out-result { color: #1e3a6e; }
+  .out-info { color: #94a3b8; }
+  .out-ok { color: var(--green); font-weight: 600; }
+  .out-err { color: var(--red); font-weight: 700; }
+  .out-warn { color: var(--yellow); }
+  .out-prompt { color: var(--accent2); font-weight: 600; }
+
+  /* INPUT ROW */
+  .input-row {
+    display: flex;
+    border-top: 2px solid var(--border);
+    flex-shrink: 0;
+  }
+  .input-prompt-label {
+    padding: 0 13px;
+    background: var(--surface);
+    color: var(--accent2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+    user-select: none;
+    font-weight: 700;
+  }
+  #input-box {
+    flex: 1;
+    background: #fafcff;
+    color: var(--text);
+    border: none;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    outline: none;
+    caret-color: var(--accent2);
+  }
+  #input-box:disabled { color: var(--muted); background: var(--surface); cursor: not-allowed; }
+  #input-box::placeholder { color: #b0bbce; }
+  #btn-send {
+    background: var(--accent2);
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  #btn-send:hover { background: #bf4a00; }
+  #btn-send:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  /* STATUS BAR */
+  .status-bar {
+    display: flex;
+    gap: 20px;
+    padding: 4px 18px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    font-size: 0.68rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .status-ok { color: var(--green); font-weight: 700; }
+  .status-err { color: var(--red); font-weight: 700; }
+  .status-run { color: var(--accent); font-weight: 700; }
+  .status-bar .brand {
+    margin-left: auto;
+    color: #b0bbce;
+    font-size: 0.65rem;
+  }
+
+  /* HELP MODAL */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(30,42,69,0.55);
+    backdrop-filter: blur(2px);
+    z-index: 200;
+    overflow-y: auto;
+    padding: 24px 16px;
+  }
+  .modal-bg.open { display: flex; justify-content: center; }
+  .modal {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 28px;
+    max-width: 700px;
+    width: 100%;
+    height: fit-content;
+    box-shadow: 0 20px 60px rgba(30,42,69,0.15);
+  }
+  .modal h2 {
+    font-family: 'Syne', sans-serif;
+    color: var(--accent);
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+  }
+  .modal .modal-sub { color: var(--muted); font-size: 0.75rem; margin-bottom: 20px; }
+  .modal h3 {
+    color: var(--accent3);
+    font-size: 0.8rem;
+    margin: 18px 0 7px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+  }
+  .modal pre {
+    background: #f4f7fb;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 0.82rem;
+    color: #1e3a6e;
+    line-height: 1.85;
+    overflow-x: auto;
+    margin: 6px 0;
+    white-space: pre;
+  }
+  .modal code {
+    background: #eef2f8;
+    color: var(--accent2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+  }
+  .ops-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .op-chip {
+    background: #f4f7fb;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.77rem;
+    color: var(--text);
+  }
+  .op-chip span { color: var(--accent); font-weight: 700; }
+  .modal-close {
+    float: right;
+    background: #fff;
+    color: var(--red);
+    border: 1px solid var(--red);
+    border-radius: 7px;
+    padding: 5px 14px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .modal-close:hover { background: #fff1f1; }
+
+  @media (max-width: 700px) {
+    body { overflow: auto; }
+    html, body { height: auto; }
+    .workspace { flex-direction: column; overflow: visible; }
+    .editor-wrap { border-right: none; border-bottom: 2px solid var(--border); }
+    #editor { min-height: 240px; }
+    #output { min-height: 200px; }
+    .toolbar { justify-content: flex-start; }
+    .status-bar { display: none; }
+    .author-badge { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo-icon">📐</div>
+    <div class="logo-info">
+      <div class="logo-title"><span>Algoritmos</span></div>
+      <div class="logo-sub">Intérprete de pseudocódigo en español · sin instalación requerida</div>
+    </div>
+    <div class="author-badge">
+      <div class="dot"></div>
+      <div>
+        <div style="font-size:0.62rem;color:#64748b;letter-spacing:0.5px;margin-bottom:1px">DOCENTE</div>
+        <div class="author-name">Dra. Maria Flores Luevanos</div>
+      </div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button class="btn btn-run" id="btn-run" onclick="runProgram()">▶ Ejecutar</button>
+    <button class="btn btn-stop" id="btn-stop" onclick="stopProgram()">■ Detener</button>
+    <button class="btn btn-clear" onclick="clearOutput()">✕ Limpiar</button>
+    <button class="btn btn-help" onclick="toggleHelp()">? Ayuda</button>
+    <div class="toolbar-sep"></div>
+    <span class="examples-label">Ejemplos:</span>
+    <button class="btn btn-ex" onclick="loadEx('hola')">Hola Mundo</button>
+    <button class="btn btn-ex" onclick="loadEx('suma')">Suma</button>
+    <button class="btn btn-ex" onclick="loadEx('promedio')">Promedio</button>
+    <button class="btn btn-ex" onclick="loadEx('si')">Si / SiNo</button>
+    <button class="btn btn-ex" onclick="loadEx('segun')">Segun</button>
+    <button class="btn btn-ex" onclick="loadEx('mientras')">Mientras</button>
+    <button class="btn btn-ex" onclick="loadEx('para')">Para</button>
+    <button class="btn btn-ex" onclick="loadEx('repetir')">Repetir</button>
+  </div>
+</header>
+
+<div class="workspace">
+  <div class="editor-wrap">
+    <div class="pane-header"><span class="pane-dot dot-blue"></span>EDITOR DE PSEUDOCÓDIGO</div>
+    <textarea id="editor" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+  </div>
+  <div class="console-wrap">
+    <div class="pane-header"><span class="pane-dot dot-orange"></span>CONSOLA DE SALIDA</div>
+    <div id="output"></div>
+    <div class="input-row">
+      <div class="input-prompt-label">&gt;_</div>
+      <input id="input-box" type="text" placeholder="Escribe el valor y presiona Enter..."
+             disabled onkeydown="if(event.key==='Enter')sendInput()" autocomplete="off" />
+      <button id="btn-send" onclick="sendInput()" disabled>↩ Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<div class="status-bar">
+  <span id="status-txt">● Listo</span>
+  <span>Instrucciones: Algoritmo · Definir · Escribir · Leer · Si · Segun · Mientras · Para · Repetir</span>
+  <span class="brand">Dra. Maria Flores Luevanos · Algoritmos Web v1.0</span>
+</div>
+
+<!-- MODAL AYUDA -->
+<div class="modal-bg" id="help-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="toggleHelp()">✕ Cerrar</button>
+    <h2>📖 Referencia de Pseudocódigo</h2>
+    <div class="modal-sub">Sintaxis compatible con PSeInt · Dra. Maria Flores Luevanos</div>
+
+    <h3>Estructura del programa</h3>
+    <pre>Algoritmo NombreDelPrograma
+   // Tu código aquí
+FinAlgoritmo</pre>
+
+    <h3>Declarar variables</h3>
+    <pre>Definir nombre Como Cadena
+Definir edad, suma Como Entero
+Definir promedio Como Real</pre>
+
+    <h3>Entrada y Salida</h3>
+    <pre>Escribir 'Hola mundo'
+Escribir 'El resultado es: ', resultado
+Leer nombre
+Leer x, y</pre>
+
+    <h3>Asignación</h3>
+    <pre>resultado <- a + b
+nombre <- 'Juan'</pre>
+
+    <h3>Operadores</h3>
+    <div class="ops-grid">
+      <div class="op-chip"><span>+</span> Suma</div>
+      <div class="op-chip"><span>-</span> Resta</div>
+      <div class="op-chip"><span>*</span> Multiplicación</div>
+      <div class="op-chip"><span>/</span> División</div>
+      <div class="op-chip"><span>^</span> Potencia</div>
+      <div class="op-chip"><span>MOD</span> Módulo</div>
+      <div class="op-chip"><span>=</span> Igual</div>
+      <div class="op-chip"><span>&lt;&gt;</span> Distinto</div>
+      <div class="op-chip"><span>&lt; &gt;</span> Menor / Mayor</div>
+      <div class="op-chip"><span>&lt;= &gt;=</span> Menor/Mayor igual</div>
+      <div class="op-chip"><span>Y</span> AND lógico</div>
+      <div class="op-chip"><span>O</span> OR lógico</div>
+      <div class="op-chip"><span>NO</span> NOT lógico</div>
+    </div>
+
+    <h3>Condicional Si</h3>
+    <pre>Si edad >= 18 Entonces
+   Escribir 'Mayor de edad'
+SiNo
+   Escribir 'Menor de edad'
+FinSi</pre>
+
+    <h3>Selección múltiple — Segun</h3>
+    <pre>Segun opcion Hacer
+   1: Escribir 'Uno'
+   2: Escribir 'Dos'
+   De Otro Modo: Escribir 'Inválido'
+FinSegun</pre>
+
+    <h3>Ciclo Mientras</h3>
+    <pre>Mientras i <= 10 Hacer
+   Escribir i
+   i <- i + 1
+FinMientras</pre>
+
+    <h3>Ciclo Para</h3>
+    <pre>Para i <- 1 Hasta 10 Hacer
+   Escribir i
+FinPara
+// Con paso negativo:
+Para i <- 10 Hasta 1 Con Paso -1 Hacer
+   Escribir i
+FinPara</pre>
+
+    <h3>Ciclo Repetir</h3>
+    <pre>Repetir
+   Leer opcion
+Hasta Que opcion = 0</pre>
+
+    <h3>Comentarios</h3>
+    <pre>// Esto es un comentario (se ignora al ejecutar)</pre>
+  </div>
+</div>
+
+<script>
+const EXAMPLES = {
+hola: `Algoritmo HolaMundo
+   Escribir '======================================='
+   Escribir '   Bienvenidos a Algoritmos Web'
+   Escribir '   Dra. Maria Flores Luevanos'
+   Escribir '======================================='
+   Escribir ''
+   Escribir 'Hola, Mundo!'
+   Escribir 'Este programa corre directo en tu navegador.'
+FinAlgoritmo`,
+
+suma: `Algoritmo SumaNumeros
+   Definir a, b, resultado Como Real
+   Escribir 'Calculadora de suma'
+   Escribir '-------------------'
+   Escribir 'Ingresa el primer número:'
+   Leer a
+   Escribir 'Ingresa el segundo número:'
+   Leer b
+   resultado <- a + b
+   Escribir 'Resultado: ', a, ' + ', b, ' = ', resultado
+FinAlgoritmo`,
+
+promedio: `Algoritmo Promedio
+   Definir n1, n2, n3, prom Como Real
+   Escribir 'Calificaciones (escala 0-10)'
+   Escribir 'Nota 1:'
+   Leer n1
+   Escribir 'Nota 2:'
+   Leer n2
+   Escribir 'Nota 3:'
+   Leer n3
+   prom <- (n1 + n2 + n3) / 3
+   Escribir 'Promedio: ', prom
+   Si prom >= 6 Entonces
+      Escribir 'APROBADO'
+   SiNo
+      Escribir 'REPROBADO'
+   FinSi
+FinAlgoritmo`,
+
+si: `Algoritmo ClasificaEdad
+   Definir edad Como Entero
+   Escribir 'Ingresa tu edad:'
+   Leer edad
+   Si edad < 0 Entonces
+      Escribir 'Edad inválida'
+   SiNo
+      Si edad < 13 Entonces
+         Escribir 'Eres un niño'
+      SiNo
+         Si edad < 18 Entonces
+            Escribir 'Eres un adolescente'
+         SiNo
+            Si edad < 65 Entonces
+               Escribir 'Eres un adulto'
+            SiNo
+               Escribir 'Eres un adulto mayor'
+            FinSi
+         FinSi
+      FinSi
+   FinSi
+FinAlgoritmo`,
+
+segun: `Algoritmo MenuDias
+   Definir op Como Entero
+   Escribir '====== MENÚ DE DÍAS ======'
+   Escribir '1. Lunes'
+   Escribir '2. Martes'
+   Escribir '3. Miércoles'
+   Escribir '4. Jueves'
+   Escribir '5. Viernes'
+   Escribir '6. Fin de semana'
+   Escribir '=========================='
+   Escribir 'Elige una opción (1-6):'
+   Leer op
+   Segun op Hacer
+      1: Escribir 'Lunes: inicio de semana'
+      2: Escribir 'Martes: segundo día'
+      3: Escribir 'Miércoles: mitad de semana'
+      4: Escribir 'Jueves: casi llegamos'
+      5: Escribir 'Viernes: fin de semana cerca!'
+      6: Escribir 'A descansar!'
+      De Otro Modo: Escribir 'Opción no válida'
+   FinSegun
+FinAlgoritmo`,
+
+mientras: `Algoritmo SumaHasta
+   Definir i, suma Como Entero
+   suma <- 0
+   i <- 1
+   Mientras i <= 10 Hacer
+      suma <- suma + i
+      Escribir 'Suma parcial con i=', i, ': ', suma
+      i <- i + 1
+   FinMientras
+   Escribir '---'
+   Escribir 'Suma total 1..10 = ', suma
+FinAlgoritmo`,
+
+para: `Algoritmo TablaMultiplicar
+   Definir n, i Como Entero
+   Escribir 'Ingresa el número de la tabla:'
+   Leer n
+   Escribir '--- Tabla del ', n, ' ---'
+   Para i <- 1 Hasta 10 Hacer
+      Escribir n, ' x ', i, ' = ', n * i
+   FinPara
+FinAlgoritmo`,
+
+repetir: `Algoritmo Adivina
+   Definir secreto, intento, vidas Como Entero
+   secreto <- 7
+   vidas <- 3
+   Escribir 'Adivina el número del 1 al 10'
+   Escribir 'Tienes ', vidas, ' intentos!'
+   Repetir
+      Escribir 'Tu intento:'
+      Leer intento
+      vidas <- vidas - 1
+      Si intento < secreto Entonces
+         Escribir 'Muy bajo. Intentos restantes: ', vidas
+      SiNo
+         Si intento > secreto Entonces
+            Escribir 'Muy alto. Intentos restantes: ', vidas
+         FinSi
+      FinSi
+   Hasta Que intento = secreto O vidas = 0
+   Si intento = secreto Entonces
+      Escribir 'Correcto! Muy bien!'
+   SiNo
+      Escribir 'Se acabaron los intentos. Era el ', secreto
+   FinSi
+FinAlgoritmo`
+};
+
+function loadEx(name) {
+  document.getElementById('editor').value = EXAMPLES[name] || '';
+  clearOutput();
+}
+function toggleHelp() {
+  document.getElementById('help-modal').classList.toggle('open');
+}
+function setStatus(msg, cls='') {
+  const el = document.getElementById('status-txt');
+  el.textContent = msg; el.className = cls;
+}
+function print(msg, cls='out-result') {
+  const out = document.getElementById('output');
+  const d = document.createElement('div');
+  d.className = 'out-line ' + cls;
+  d.textContent = msg;
+  out.appendChild(d);
+  out.scrollTop = out.scrollHeight;
+}
+function clearOutput() {
+  document.getElementById('output').innerHTML = '';
+  print('// Consola lista.', 'out-info');
+}
+
+let inputResolve = null, stopFlag = false;
+function enableInput() {
+  document.getElementById('input-box').disabled = false;
+  document.getElementById('btn-send').disabled = false;
+  document.getElementById('input-box').focus();
+}
+function disableInput() {
+  document.getElementById('input-box').disabled = true;
+  document.getElementById('btn-send').disabled = true;
+}
+function sendInput() {
+  const b = document.getElementById('input-box');
+  const val = b.value; b.value = '';
+  print('> ' + val, 'out-prompt');
+  disableInput();
+  if (inputResolve) { const r = inputResolve; inputResolve = null; r(val); }
+}
+function askInput() {
+  return new Promise((resolve, reject) => {
+    if (stopFlag) { reject(new Error('STOPPED')); return; }
+    inputResolve = val => { if (stopFlag) reject(new Error('STOPPED')); else resolve(val); };
+    enableInput();
+  });
+}
+
+// TOKENIZER
+function tokenize(line) {
+  line = line.replace(/\/\/.*$/, '').trim();
+  if (!line) return [];
+  const toks = []; let i = 0;
+  while (i < line.length) {
+    if (/\s/.test(line[i])) { i++; continue; }
+    if (line[i]=="'" || line[i]=='"') {
+      const q=line[i++]; let s='';
+      while(i<line.length && line[i]!==q) s+=line[i++]; i++;
+      toks.push({t:'STR',v:s}); continue;
+    }
+    if (/[0-9]/.test(line[i])) {
+      let n=''; while(i<line.length && /[0-9.]/.test(line[i])) n+=line[i++];
+      toks.push({t:'NUM',v:parseFloat(n)}); continue;
+    }
+    const two=line.slice(i,i+2);
+    if(['<-','<>','<=','>='].includes(two)){toks.push({t:'OP',v:two});i+=2;continue;}
+    if('+-*/^%=<>(),;:'.includes(line[i])){toks.push({t:'OP',v:line[i++]});continue;}
+    let w=''; while(i<line.length && /[\wÀ-öø-ÿ]/.test(line[i])) w+=line[i++];
+    if(w) toks.push({t:'WRD',v:w}); else i++;
+  }
+  return toks;
+}
+
+// EXPRESSION EVALUATOR
+function evalExpr(toks, env) {
+  const js = toks.map(tk => {
+    if(tk.t==='STR') return JSON.stringify(tk.v);
+    if(tk.t==='NUM') return tk.v;
+    if(tk.t==='OP') {
+      if(tk.v==='<>') return '!=';
+      if(tk.v==='<-') return '=';
+      if(tk.v==='=') return '==';
+      if(tk.v==='^') return '**';
+      return tk.v;
+    }
+    const u=tk.v.toUpperCase();
+    if(u==='Y'||u==='AND') return '&&';
+    if(u==='O'||u==='OR') return '||';
+    if(u==='NO'||u==='NOT') return '!';
+    if(u==='VERDADERO') return 'true';
+    if(u==='FALSO') return 'false';
+    if(u==='MOD') return '%';
+    if(tk.v in env){ const v=env[tk.v]; return typeof v==='string'?JSON.stringify(v):v; }
+    return JSON.stringify(tk.v);
+  }).join(' ');
+  try { return Function('"use strict";return('+js+')')(); }
+  catch(e) { throw new Error('Error en expresión: '+toks.map(t=>t.v).join(' ')); }
+}
+
+function splitComma(toks) {
+  const p=[[]];
+  for(const t of toks){ if(t.t==='OP'&&t.v===',') p.push([]); else p[p.length-1].push(t); }
+  return p.filter(x=>x.length);
+}
+
+// BLOCK FINDERS
+function findBlock(lines,start,openRe,closeRe) {
+  let d=1;
+  for(let j=start+1;j<lines.length;j++){
+    const t=lines[j].trim();
+    if(closeRe.test(t)){if(--d===0)return j;}
+    else if(openRe.test(t)) d++;
+  }
+  return -1;
+}
+function findSiNo(lines,from,to) {
+  let d=0;
+  for(let j=from;j<=to;j++){
+    const u=lines[j].trim().toUpperCase();
+    if(/^SI\b/.test(u)) d++;
+    if(/^FINSI\b/.test(u)&&d>0) d--;
+    if(/^SINO\b/.test(u)&&d===0) return j;
+  }
+  return -1;
+}
+function findHastaQue(lines,from) {
+  for(let j=from;j<lines.length;j++)
+    if(/^HASTA\s+QUE\b/i.test(lines[j].trim())) return j;
+  return -1;
+}
+
+// INTERPRETER
+async function run(lines,start,end,env) {
+  let i=start;
+  while(i<=end) {
+    if(stopFlag) throw new Error('STOPPED');
+    await new Promise(r=>setTimeout(r,0));
+    const raw=(lines[i]||'').replace(/\/\/.*$/,'').trim();
+    if(!raw){i++;continue;}
+    const toks=tokenize(raw);
+    if(!toks.length){i++;continue;}
+    const kw=toks[0].v.toUpperCase();
+
+    if(/^(ALGORITMO|PROCESO|FINALGORITMO|FINPROCESO)$/.test(kw)){i++;continue;}
+
+    if(kw==='DEFINIR'||kw==='DIM'){
+      toks.slice(1).forEach(t=>{
+        if(t.t==='WRD'&&!['COMO','ENTERO','REAL','CADENA','LOGICO','CARACTER'].includes(t.v.toUpperCase())&&!(t.v in env))
+          env[t.v]=0;
+      });
+      i++;continue;
+    }
+
+    if(/^(ESCRIBIR|MOSTRAR|IMPRIMIR)$/.test(kw)){
+      const out=splitComma(toks.slice(1)).map(p=>String(evalExpr(p,env))).join('');
+      print(out); i++;continue;
+    }
+
+    if(/^(LEER|INGRESAR)$/.test(kw)){
+      for(const v of toks.slice(1).filter(t=>t.t==='WRD')){
+        const ri=await askInput();
+        const n=parseFloat(ri); env[v.v]=isNaN(n)?ri:n;
+      }
+      i++;continue;
+    }
+
+    if(toks.length>=3&&toks[0].t==='WRD'&&(toks[1].v==='<-'||toks[1].v==='=')){
+      env[toks[0].v]=evalExpr(toks.slice(2),env); i++;continue;
+    }
+
+    if(kw==='SI'){
+      const endSi=findBlock(lines,i,/^SI\b/i,/^FINSI\b/i);
+      if(endSi<0) throw new Error('FinSi no encontrado (línea '+(i+1)+')');
+      const eIdx=toks.findIndex(t=>t.v.toUpperCase()==='ENTONCES');
+      const cond=evalExpr(eIdx>0?toks.slice(1,eIdx):toks.slice(1),env);
+      const sino=findSiNo(lines,i+1,endSi-1);
+      if(cond) await run(lines,i+1,sino>=0?sino-1:endSi-1,env);
+      else if(sino>=0) await run(lines,sino+1,endSi-1,env);
+      i=endSi+1;continue;
+    }
+
+    if(/^SEG[UÚ]N$/.test(kw)){
+      const endSeg=findBlock(lines,i,/^SEG[UÚ]N\b/i,/^FINSEG[UÚ]N\b/i);
+      if(endSeg<0) throw new Error('FinSegun no encontrado (línea '+(i+1)+')');
+      const varTok=toks.find((t,idx)=>idx>0&&t.t==='WRD'&&t.v.toUpperCase()!=='HACER');
+      if(!varTok) throw new Error('Variable no encontrada en Segun');
+      const val=env[varTok.v]!==undefined?env[varTok.v]:varTok.v;
+      let j=i+1,matched=false,defStart=-1;
+      while(j<endSeg){
+        const ct=tokenize(lines[j].trim());
+        if(!ct.length){j++;continue;}
+        const fu=ct[0].v.toUpperCase();
+        if(fu==='DE'){defStart=j+1;j++;continue;}
+        if(ct.length>0&&ct[ct.length-1].v===':'){
+          const caseVals=ct.slice(0,-1).filter(t=>!(t.t==='OP'&&t.v===','));
+          let cEnd=j+1;
+          while(cEnd<endSeg){
+            const nx=tokenize(lines[cEnd].trim());
+            if(!nx.length){cEnd++;continue;}
+            const nf=nx[0].v.toUpperCase();
+            if(nf==='DE'||(nx[nx.length-1].v===':')||/^FINSEG[UÚ]N$/.test(nf)) break;
+            cEnd++;
+          }
+          for(const cv of caseVals){
+            const cval=cv.t==='NUM'?cv.v:cv.t==='STR'?cv.v:(env[cv.v]!==undefined?env[cv.v]:cv.v);
+            if(String(cval)===String(val)||cval==val){await run(lines,j+1,cEnd-1,env);matched=true;break;}
+          }
+          if(matched) break;
+          j=cEnd;continue;
+        }
+        j++;
+      }
+      if(!matched&&defStart>=0) await run(lines,defStart,endSeg-1,env);
+      i=endSeg+1;continue;
+    }
+
+    if(kw==='MIENTRAS'){
+      const endW=findBlock(lines,i,/^MIENTRAS\b/i,/^FINMIENTRAS\b/i);
+      if(endW<0) throw new Error('FinMientras no encontrado (línea '+(i+1)+')');
+      const hIdx=toks.findIndex(t=>t.v.toUpperCase()==='HACER');
+      const condToks=hIdx>0?toks.slice(1,hIdx):toks.slice(1);
+      let iter=0;
+      while(evalExpr(condToks,env)){
+        if(stopFlag) throw new Error('STOPPED');
+        if(++iter>100000) throw new Error('Ciclo infinito detectado (Mientras)');
+        await run(lines,i+1,endW-1,env);
+      }
+      i=endW+1;continue;
+    }
+
+    if(kw==='PARA'){
+      const endP=findBlock(lines,i,/^PARA\b/i,/^FINPARA\b/i);
+      if(endP<0) throw new Error('FinPara no encontrado (línea '+(i+1)+')');
+      const varName=toks[1]?.v;
+      const arrowI=toks.findIndex(t=>t.v==='<-');
+      const hastaI=toks.findIndex(t=>t.v.toUpperCase()==='HASTA');
+      const pasoI=toks.findIndex(t=>t.v.toUpperCase()==='PASO');
+      const hacerI=toks.findIndex(t=>t.v.toUpperCase()==='HACER');
+      if(!varName||arrowI<0||hastaI<0) throw new Error('Sintaxis inválida en Para');
+      const initVal=evalExpr(toks.slice(arrowI+1,hastaI),env);
+      const endTok=pasoI>0?toks.slice(hastaI+1,pasoI):hacerI>0?toks.slice(hastaI+1,hacerI):toks.slice(hastaI+1);
+      const endVal=evalExpr(endTok,env);
+      let step=1;
+      if(pasoI>0) step=evalExpr(toks.slice(pasoI+1,hacerI>0?hacerI:toks.length),env);
+      if(step===0) throw new Error('Paso no puede ser 0');
+      env[varName]=initVal;
+      let iter=0;
+      while(step>0?env[varName]<=endVal:env[varName]>=endVal){
+        if(stopFlag) throw new Error('STOPPED');
+        if(++iter>100000) throw new Error('Ciclo infinito detectado (Para)');
+        await run(lines,i+1,endP-1,env);
+        env[varName]+=step;
+      }
+      i=endP+1;continue;
+    }
+
+    if(kw==='REPETIR'){
+      const hastaLine=findHastaQue(lines,i+1);
+      if(hastaLine<0) throw new Error('Hasta Que no encontrado para Repetir (línea '+(i+1)+')');
+      let iter=0;
+      do {
+        if(stopFlag) throw new Error('STOPPED');
+        if(++iter>100000) throw new Error('Ciclo infinito detectado (Repetir)');
+        await run(lines,i+1,hastaLine-1,env);
+        const hToks=tokenize(lines[hastaLine]);
+        const qIdx=hToks.findIndex(t=>t.v.toUpperCase()==='QUE');
+        if(evalExpr(hToks.slice(qIdx+1),env)) break;
+      } while(true);
+      i=hastaLine+1;continue;
+    }
+
+    i++;
+  }
+}
+
+let isRunning=false;
+async function runProgram() {
+  if(isRunning) return;
+  isRunning=true; stopFlag=false;
+  clearOutput();
+  print('// Ejecutando...','out-info');
+  print('','out-info');
+  document.getElementById('btn-run').disabled=true;
+  document.getElementById('btn-stop').style.display='inline-block';
+  setStatus('● Ejecutando...','status-run');
+  const lines=document.getElementById('editor').value.split('\n').map(l=>l.trim());
+  try {
+    await run(lines,0,lines.length-1,{});
+    if(!stopFlag){
+      print('','out-info');
+      print('// Programa terminado correctamente.','out-ok');
+      setStatus('● Terminado correctamente','status-ok');
+    }
+  } catch(e) {
+    if(e.message==='STOPPED'){
+      print('','out-info');
+      print('// Ejecución detenida.','out-warn');
+      setStatus('■ Detenido','');
+    } else {
+      print('','out-info');
+      print('// ERROR: '+e.message,'out-err');
+      setStatus('✘ Error: '+e.message,'status-err');
+    }
+  }
+  isRunning=false;
+  if(inputResolve){disableInput();inputResolve=null;}
+  document.getElementById('btn-run').disabled=false;
+  document.getElementById('btn-stop').style.display='none';
+}
+
+function stopProgram() {
+  stopFlag=true;
+  if(inputResolve){const r=inputResolve;inputResolve=null;disableInput();r('');}
+}
+
+document.getElementById('editor').value=EXAMPLES.hola;
+clearOutput();
+</script>
+</body>
+</html>
