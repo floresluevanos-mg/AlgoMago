@@ -1,0 +1,2 @@
+# AlgoMago
+Compiladorr de algoritmos
